@@ -2,6 +2,7 @@ from fractions import Fraction
 
 import numpy as np
 
+import matrix_manipulation
 from matrix_manipulation import do_row_operation, ElementaryOperation, do_series_of_operations, free_text_reduce
 
 
@@ -163,18 +164,32 @@ def test_free_text_reduce_1():
 def test_free_text_reduce2():
     matrix = [np.array([1, 1, 2]), np.array([2, 2, 1])]
     reduce_ops = [
-                    "r2=r2-2r1",
-                    "r2=-1/3r2",
-                    "r1=r1-2r2",
-                ]
+        "r2=r2-2r1",
+        "r2=-1/3r2",
+        "r1=r1-2r2",
+    ]
     expected = np.array(
         [[1, 1, 0],
          [0, 0, 1]]
     )
     reduced = free_text_reduce(np.array(matrix),
-                     cmds=reduce_ops)
+                               cmds=reduce_ops)
     assert np.array_equal(expected, reduced)
 
     reduction_latex = free_text_reduce(np.array(matrix),
-                     cmds=reduce_ops, return_latex=True)
+                                       cmds=reduce_ops, return_latex=True)
     assert reduction_latex == '\\begin{bmatrix}\n  1 & 1 & 2\\\\\n  2 & 2 & 1\\\\\n\\end{bmatrix}\\overset{R_{2}\\rightarrow{}R_{2}-2R_{1}}{\\longrightarrow}\\begin{bmatrix}\n  1 & 1 & 2\\\\\n  0 & 0 & -3\\\\\n\\end{bmatrix}\\overset{R_{2}\\rightarrow{}-1/3R_{2}}{\\longrightarrow}\\begin{bmatrix}\n  1 & 1 & 2\\\\\n  0 & 0 & 1\\\\\n\\end{bmatrix}\\overset{R_{1}\\rightarrow{}R_{1}-2R_{2}}{\\longrightarrow}\\begin{bmatrix}\n  1 & 1 & 0\\\\\n  0 & 0 & 1\\\\\n\\end{bmatrix}'
+
+
+def test_matrix_flatten():
+    U = np.array([
+        [[1, 0], [3, 0]],  # u1
+        [[2, 1], [3, 1]],  # u2
+        [[1, 4], [1, 4]]  # u3
+    ])
+
+    u1, u2, u3 = U
+
+    assert np.array_equal(matrix_manipulation.flatten_matrix(u1), np.array([1, 0, 3, 0]))
+    assert np.array_equal(matrix_manipulation.flatten_matrix(u2), np.array([2, 1, 3, 1]))
+    assert np.array_equal(matrix_manipulation.flatten_matrix(u3), np.array([1, 4, 1, 4]))

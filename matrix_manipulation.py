@@ -179,3 +179,7 @@ def free_text_reduce(mat: np.ndarray, cmds: List[str], finite_field: Optional[st
     if return_latex is True:
         return latex_print
     return mat
+
+
+def flatten_matrix(mat: np.ndarray) -> np.ndarray:
+    return np.array(list(np.matrix(mat).flatten().flat))
