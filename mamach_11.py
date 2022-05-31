@@ -5,7 +5,7 @@ import numpy as np
 from sympy import Matrix
 
 import matrix_manipulation
-from matrix_manipulation import bmatrix, test_symmetry, matrix_pprint, test_anti_symmetry
+from matrix_manipulation import bmatrix, check_symmetry, matrix_pprint, check_anti_symmetry
 
 A_8 = np.array([
     [1, 1, 1, 1],
@@ -99,22 +99,22 @@ for _ in range(10_000):
     A_15 = np.random.rand(rand_dim, rand_dim)
     B_15 = np.random.rand(rand_dim, rand_dim)
 
-    assert test_symmetry(np.array([[0, 1], [1, 2]]))
-    assert not test_symmetry(np.array([[0, 1.2], [1, 2]]))
+    assert check_symmetry(np.array([[0, 1], [1, 2]]))
+    assert not check_symmetry(np.array([[0, 1.2], [1, 2]]))
 
     AB_15 = A_15 @ B_15.transpose() + B_15 @ A_15.transpose()
-    assert test_symmetry(AB_15), f"{AB_15} is not symmetric"
+    assert check_symmetry(AB_15), f"{AB_15} is not symmetric"
 
     A_15_b = np.random.rand(rand_dim, rand_dim)
     A_15_b = A_15_b + A_15_b.T
-    assert test_symmetry(A_15_b)
+    assert check_symmetry(A_15_b)
     B_15_b = np.random.rand(rand_dim, rand_dim)
     B_15_b = B_15_b + -B_15_b.T
-    assert test_anti_symmetry(B_15_b)
+    assert check_anti_symmetry(B_15_b)
 
     mat_pow = np.linalg.matrix_power
     AB_15_b = (mat_pow(A_15_b, 5) @ mat_pow(B_15_b, 3)) - (mat_pow(B_15_b, 3) @ mat_pow(A_15_b, 5))
-    assert test_symmetry(AB_15_b), f"{AB_15_b} is not symmetric!"
+    assert check_symmetry(AB_15_b), f"{AB_15_b} is not symmetric!"
 
 print("Done! all true")
 

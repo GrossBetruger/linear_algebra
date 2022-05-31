@@ -7,6 +7,8 @@ from fractions import Fraction
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
 
 
 class ElementaryOperation(Enum):
@@ -71,11 +73,11 @@ def matrix_pprint(matrix: np.ndarray) -> str:
     return "\n".join(pd.DataFrame(matrix).to_string(index=False).splitlines()[1:])
 
 
-def test_symmetry(matrix: np.ndarray) -> bool:
+def check_symmetry(matrix: np.ndarray) -> bool:
     return np.allclose(matrix, matrix.transpose())
 
 
-def test_anti_symmetry(matrix: np.ndarray) -> bool:
+def check_anti_symmetry(matrix: np.ndarray) -> bool:
     return np.allclose(-matrix, matrix.transpose())
 
 
@@ -183,3 +185,28 @@ def free_text_reduce(mat: np.ndarray, cmds: List[str], finite_field: Optional[st
 
 def flatten_matrix(mat: np.ndarray) -> np.ndarray:
     return np.array(list(np.matrix(mat).flatten().flat))
+
+
+def paint_2_d_vectors(vectors: np.ndarray, colors: Optional[List[str]] = None):
+    ax = plt.axes()
+    for vec, col in zip(vectors, colors):
+        ax.arrow(0, 0, *vec, head_width=0.05, head_length=0.1, color=col)
+        ax.arrow(0, 0, *vec, head_width=0.05, head_length=0.1, color=col)
+    plt.show()
+
+
+if __name__ == "__main__":
+    V = np.array([[1, 5], [5, 1]])
+    colors = ['r', 'r', 'g', 'g']
+    rotate_90_deg = np.array([
+        [0, -1],
+        [1, 0],
+    ])
+    invert_x_y = np.array([
+        [0, 1],
+        [1, 0],
+    ])
+    invert_x_y_to_the_two = invert_x_y @ invert_x_y  # this transformation will do nothing
+    U = np.array([rotate_90_deg @ v for v in V])
+    print(U)
+    paint_2_d_vectors(np.concatenate([V, U]), colors)

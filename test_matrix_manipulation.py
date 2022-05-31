@@ -193,3 +193,4 @@ def test_matrix_flatten():
     assert np.array_equal(matrix_manipulation.flatten_matrix(u1), np.array([1, 0, 3, 0]))
     assert np.array_equal(matrix_manipulation.flatten_matrix(u2), np.array([2, 1, 3, 1]))
     assert np.array_equal(matrix_manipulation.flatten_matrix(u3), np.array([1, 4, 1, 4]))
+
