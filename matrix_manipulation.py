@@ -105,15 +105,7 @@ def parse_row_command(cmd: str):
             op = op.group(0)
         else:
             op = None
-        # factor = re.search("([\-\+])(\\d+)", text)
-        # fraction_factor = re.search("\d+/\d+", text)
-        # if factor:
-        #     factor = int(factor.group(2))
-        # else: # implicit factor of 1
-        #     factor = 1
-        # if fraction_factor:
-        #     numerator, denominator = fraction_factor.group(0).split("/")
-        #     factor = Fraction(numerator, denominator)
+            
         factor = parse_factor(text)
         return right_row, op, factor
 
