@@ -198,7 +198,7 @@ def flatten_matrix(mat: np.ndarray) -> np.ndarray:
     return np.array(list(np.matrix(mat).flatten().flat))
 
 
-def fraction_simplifier(x):
+def fraction_simplifier(x: Fraction) -> Union[Fraction, int]:
     if int(x) == x:
         return int(x)
 
