@@ -69,8 +69,11 @@ def bmatrix(a):
     return '\n'.join(rv)
 
 
-def matrix_pprint(matrix: np.ndarray) -> str:
-    return "\n".join(pd.DataFrame(matrix).to_string(index=False).splitlines()[1:])
+def matrix_pprint(matrix: np.ndarray, print_when_called: bool = True) -> str:
+    pretty_matrix = "\n".join(pd.DataFrame(matrix).to_string(index=False).splitlines()[1:])
+    if print_when_called is True:
+        print(pretty_matrix)
+    return pretty_matrix
 
 
 def check_symmetry(matrix: np.ndarray) -> bool:
@@ -128,7 +131,7 @@ def parse_row_command(cmd: str):
     return left_row, right_row, op, factor
 
 
-def free_text_row_operation(m: np.array, cmd: str) -> np.ndarray:
+def free_text_row_operation(m: np.array, cmd: str, support_fractions: bool) -> np.ndarray:
     left_row, right_row, op, factor = parse_row_command(cmd)
     print(left_row, right_row, op, factor)
     m = do_row_operation(
@@ -137,7 +140,7 @@ def free_text_row_operation(m: np.array, cmd: str) -> np.ndarray:
         right_row=int(right_row[1]),
         factor=factor,
         op=op,
-        support_fractions=False,
+        support_fractions=support_fractions,
     )
     return m
 
@@ -159,25 +162,33 @@ def latex_row_operation_notation(row_operation_text):
     return rf"\overset{{R_{{{left_row}}}\rightarrow{{}}R_{{{left_row}}}{factor}R_{{{right_row}}}}}{{\longrightarrow}}"
 
 
+def fraction_notation_to_latex(matrix_latex_print: str):
+    return re.sub("Fraction\((-?\d+), & (-?\d+)\)", r"\\frac{\1}{\2}", matrix_latex_print)
+
+
 def free_text_reduce(mat: np.ndarray, cmds: List[str], finite_field: Optional[str] = None,
                      return_latex: Optional[bool] = False) -> np.ndarray:
+    support_fractions = True
     if finite_field is not None:
+        support_fractions = False
         prime = int(re.search("(Z|z)(\d)", finite_field).group(2))
         mat = mat % prime
 
     latex_print = bmatrix(mat)
     for cmd in cmds:
         # print(cmd)
-        mat = free_text_row_operation(mat, cmd)
+        mat = free_text_row_operation(mat, cmd, support_fractions)
         # print(mat)
         if finite_field is not None:
             prime = int(re.search("(Z|z)(\d)", finite_field).group(2))
             mat = mat % prime
 
+        matrix_fraction_simplifier(mat=mat)
         latex_print += latex_row_operation_notation(cmd)
         latex_print += bmatrix(mat)
 
-    print(latex_print)
+    print(fraction_notation_to_latex(latex_print))
+    # print(latex_print)
     if return_latex is True:
         return latex_print
     return mat
@@ -185,6 +196,24 @@ def free_text_reduce(mat: np.ndarray, cmds: List[str], finite_field: Optional[st
 
 def flatten_matrix(mat: np.ndarray) -> np.ndarray:
     return np.array(list(np.matrix(mat).flatten().flat))
+
+
+def fraction_simplifier(x):
+    if int(x) == x:
+        return int(x)
+
+    return x
+
+
+def matrix_fraction_simplifier(mat: np.ndarray):
+    """
+    in place fraction simplifier
+    :param mat:, matrix as numpy array
+    """
+    m, n = mat.shape
+    for i in range(m):
+        for j in range(n):
+            mat[i][j] = fraction_simplifier(mat[i][j])
 
 
 def paint_2_d_vectors(vectors: np.ndarray, colors: Optional[List[str]] = None):
@@ -210,3 +239,5 @@ if __name__ == "__main__":
     U = np.array([rotate_90_deg @ v for v in V])
     print(U)
     paint_2_d_vectors(np.concatenate([V, U]), colors)
+
+    print(rotate_90_deg)

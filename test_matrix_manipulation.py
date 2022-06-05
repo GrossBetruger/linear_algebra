@@ -181,6 +181,34 @@ def test_free_text_reduce2():
     assert reduction_latex == '\\begin{bmatrix}\n  1 & 1 & 2\\\\\n  2 & 2 & 1\\\\\n\\end{bmatrix}\\overset{R_{2}\\rightarrow{}R_{2}-2R_{1}}{\\longrightarrow}\\begin{bmatrix}\n  1 & 1 & 2\\\\\n  0 & 0 & -3\\\\\n\\end{bmatrix}\\overset{R_{2}\\rightarrow{}-1/3R_{2}}{\\longrightarrow}\\begin{bmatrix}\n  1 & 1 & 2\\\\\n  0 & 0 & 1\\\\\n\\end{bmatrix}\\overset{R_{1}\\rightarrow{}R_{1}-2R_{2}}{\\longrightarrow}\\begin{bmatrix}\n  1 & 1 & 0\\\\\n  0 & 0 & 1\\\\\n\\end{bmatrix}'
 
 
+def test_free_text_reduce_fraction_support():
+    # fractions are supported by default unless finite field is used
+
+    matrix = np.array([
+        [1, 1, 0],
+        [0, 2, 1],
+        [-2, 0, 1],
+    ])
+
+    res = matrix_manipulation.free_text_reduce(cmds=[
+        "r3=r3+2r1",
+        "r3=r3-r2",
+        "r2=1/2r2",
+        "r1=r1-r2",
+    ],
+        mat=matrix)
+
+    res = list((list(m) for m in res)) # cast to list to allow regular == operator
+
+    expected_result = [
+        [1, 0, Fraction(-1, 2)],
+        [0, 1, Fraction(1, 2)],
+        [0, 0, 0],
+    ]
+
+    assert res == expected_result
+
+
 def test_matrix_flatten():
     U = np.array([
         [[1, 0], [3, 0]],  # u1
